@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirMap - AI Powered Air Quality Mapping</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(120deg, #0e1117, #07090c);
+      color: white;
+    }
+    .blur-bg {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="relative">
+  <!-- Header -->
+  <header class="flex items-center justify-between px-8 py-6 bg-transparent">
+    <div class="text-3xl font-extrabold text-blue-400">AirMap</div>
+    <nav class="space-x-6">
+      <a href="#features" class="hover:text-blue-300">Features</a>
+      <a href="#demo" class="hover:text-blue-300">Demo</a>
+      <a href="#api" class="hover:text-blue-300">API</a>
+      <a href="#contact" class="hover:text-blue-300">Contact</a>
+      <button class="bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600" onclick="checkAuth()">Login</button>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="text-center py-24 px-6">
+    <h1 class="text-5xl font-bold leading-tight mb-6 text-blue-300">
+      Hyperlocal AI-Powered Air Quality Mapping
+    </h1>
+    <p class="text-lg max-w-2xl mx-auto text-gray-300 mb-8">
+      Get fine-resolution, animated air quality and weather visualizations powered by AI, with real-time insights and developer APIs.
+    </p>
+    <a href="javascript:void(0)" onclick="checkAuth()" class="bg-blue-600 px-6 py-3 rounded-xl text-white font-semibold hover:bg-blue-700">Get Started</a>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="blur-bg border border-blue-800 rounded-xl p-8 max-w-md w-full">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-blue-300" id="authTitle">Login</h2>
+          <button onclick="closeAuthModal()" class="text-gray-400 hover:text-white">&times;</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div class="mb-4">
+            <label class="block text-blue-300 mb-2">Email</label>
+            <input type="email" id="loginEmail" class="w-full bg-gray-800 border border-blue-700 rounded p-2 text-white" placeholder="your@email.com">
+          </div>
+          <div class="mb-6">
+            <label class="block text-blue-300 mb-2">Password</label>
+            <input type="password" id="loginPassword" class="w-full bg-gray-800 border border-blue-700 rounded p-2 text-white" placeholder="••••••••">
+          </div>
+          <button onclick="login()" class="w-full bg-blue-600 py-2 rounded-lg hover:bg-blue-700 mb-4">Login</button>
+          <p class="text-center text-gray-400">Don't have an account? <a href="javascript:void(0)" onclick="showSignup()" class="text-blue-400">Sign up</a></p>
+        </div>
+        
+        <!-- Signup Form -->
+        <div id="signupForm" class="hidden">
+          <div class="mb-4">
+            <label class="block text-blue-300 mb-2">Email</label>
+            <input type="email" id="signupEmail" class="w-full bg-gray-800 border border-blue-700 rounded p-2 text-white" placeholder="your@email.com">
+          </div>
+          <div class="mb-4">
+            <label class="block text-blue-300 mb-2">Password</label>
+            <input type="password" id="signupPassword" class="w-full bg-gray-800 border border-blue-700 rounded p-2 text-white" placeholder="••••••••">
+          </div>
+          <div class="mb-6">
+            <label class="block text-blue-300 mb-2">Confirm Password</label>
+            <input type="password" id="confirmPassword" class="w-full bg-gray-800 border border-blue-700 rounded p-2 text-white" placeholder="••••••••">
+          </div>
+          <button onclick="signup()" class="w-full bg-blue-600 py-2 rounded-lg hover:bg-blue-700 mb-4">Sign Up</button>
+          <p class="text-center text-gray-400">Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-blue-400">Login</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCFQnX0YE0u1lSDu5SDXZdq-WoLu2-_nuU",
+        authDomain: "localhost",
+        projectId: "tutamar-fd94c",
+        storageBucket: "gs://tutamar-fd94c.appspot.com",
+        messagingSenderId: "694753515768",
+        appId: "1:694753515768:web:f5c63fdf80ea0f6cc9830d"
+      };
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      
+      // Check if user is authenticated
+      function checkAuth() {
+        console.log("checkAuth called");
+        if (firebase.auth().currentUser) {
+          window.location.href = 'http://localhost:8501/';
+        } else {
+          const authModal = document.getElementById('authModal');
+          console.log("Auth modal:", authModal);
+          authModal.classList.remove('hidden');
+          authModal.classList.add('flex');
+        }
+      }
+      
+      // Close modal
+      function closeAuthModal() {
+        document.getElementById('authModal').classList.add('hidden');
+        document.getElementById('authModal').classList.remove('flex');
+      }
+      
+      // Show signup form
+      function showSignup() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('signupForm').classList.remove('hidden');
+        document.getElementById('authTitle').textContent = 'Sign Up';
+      }
+      
+      // Show login form
+      function showLogin() {
+        document.getElementById('signupForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('authTitle').textContent = 'Login';
+      }
+      
+      // Login function
+      function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+          alert('Please fill in all fields');
+          return;
+        }
+        
+        firebase.auth().signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Signed in
+            closeAuthModal();
+            window.location.href = 'http://localhost:8501/';
+          })
+          .catch((error) => {
+            alert('Login failed: ' + error.message);
+          });
+      }
+      
+      // Signup function
+      function signup() {
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (!email || !password || !confirmPassword) {
+          alert('Please fill in all fields');
+          return;
+        }
+        
+        if (password !== confirmPassword) {
+          alert('Passwords do not match');
+          return;
+        }
+        
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Signed up and signed in
+            closeAuthModal();
+            window.location.href = 'http://localhost:8501/';
+          })
+          .catch((error) => {
+            alert('Signup failed: ' + error.message);
+          });
+      }
+      
+      // Listen for auth state changes
+      firebase.auth().onAuthStateChanged((user) => {
+        // Update UI based on auth state if needed
+        console.log("Auth state changed:", user ? "logged in" : "logged out");
+      });
+    </script>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-10 py-20">
+    <div class="p-6 rounded-xl blur-bg border border-blue-800">
+      <h2 class="text-xl font-semibold mb-2 text-blue-300">AI-Based Super Resolution</h2>
+      <p>Enhance low-quality satellite data into detailed air quality maps using deep learning models.</p>
+    </div>
+    <div class="p-6 rounded-xl blur-bg border border-blue-800">
+      <h2 class="text-xl font-semibold mb-2 text-blue-300">Real-Time 3D Visualizations</h2>
+      <p>Explore air pollution, temperature, wind, and pressure in immersive 3D animated maps.</p>
+    </div>
+    <div class="p-6 rounded-xl blur-bg border border-blue-800">
+      <h2 class="text-xl font-semibold mb-2 text-blue-300">Health & API Integration</h2>
+      <p>Understand causes and health impacts of pollutants and connect with API for data access.</p>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section id="demo" class="px-10 py-20 text-center">
+    <h2 class="text-3xl font-bold mb-6 text-blue-300">Live Interactive Demo</h2>
+    <p class="mb-4 text-gray-300">Choose your region and timeframe to see AI-enhanced air quality data.</p>
+    <div class="bg-blue-900 h-80 rounded-xl flex items-center justify-center text-gray-500">
+      [MAP VISUALIZATION PLACEHOLDER]
+    </div>
+  </section>
+
+  <!-- API Section -->
+  <section id="api" class="px-10 py-20">
+    <h2 class="text-3xl font-bold mb-6 text-center text-blue-300">Developer API Access</h2>
+    <p class="text-center mb-8 text-gray-300">Access hyperlocal environmental data via secure API keys.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="p-6 blur-bg rounded-xl border border-blue-700">
+        <h3 class="text-xl font-semibold text-blue-300">Data Types</h3>
+        <ul class="list-disc pl-5 text-sm">
+          <li>AQI & Pollutants</li>
+          <li>Weather Layers</li>
+          <li>Region Metadata</li>
+        </ul>
+      </div>
+      <div class="p-6 blur-bg rounded-xl border border-blue-700">
+        <h3 class="text-xl font-semibold text-blue-300">Usage Options</h3>
+        <ul class="list-disc pl-5 text-sm">
+          <li>Rate-limited Free Tier</li>
+          <li>Custom Plans for Enterprises</li>
+          <li>OAuth2 Secured Access</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="text-center py-20 px-6">
+    <h2 class="text-3xl font-bold text-blue-300 mb-4">Let's Connect</h2>
+    <p class="text-gray-400 mb-8">Interested in partnerships, data access, or collaborations?</p>
+    <a href="mailto:contact@airmap.ai" class="text-blue-400 underline">contact@airmap.ai</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center py-6 text-gray-500 text-sm border-t border-blue-900">
+    © 2025 AirMap & Sphere Hive. All rights reserved.
+  </footer>
+</body>
+</html>
