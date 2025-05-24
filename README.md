@@ -197,7 +197,7 @@ The Streamlit app has several pages accessible from the sidebar:
 #### Air Quality Maps
 - Select a month and pollutant type
 - Generate static and interactive maps showing pollutant distribution
-- Visualize spatial patterns of air quality across the selected region
+- Visualize spatial patterns of air quality across the selected regions
 
 #### AQI Analysis
 - View calculated Air Quality Index for selected time periods
